@@ -28,7 +28,8 @@ public class UserController {
     private UserSessionRepository userSessionRepository;
     @Autowired
     private SessionService sessionService;
-    private UserDTOMapper userDTOMapper = new UserDTOMapper();
+    @Autowired
+    private UserDTOMapper userDTOMapper;
 
     @PostMapping("/register")
     public ResponseEntity<Void> prepareRegistration(@RequestBody Registration registration) {

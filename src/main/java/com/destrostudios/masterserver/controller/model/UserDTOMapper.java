@@ -1,10 +1,12 @@
 package com.destrostudios.masterserver.controller.model;
 
 import com.destrostudios.masterserver.database.schema.User;
+import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
+@Service
 public class UserDTOMapper {
 
     public UserDTO map(User user) {
