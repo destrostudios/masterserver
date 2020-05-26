@@ -1,5 +1,6 @@
 package com.destrostudios.masterserver.controller;
 
+import com.destrostudios.masterserver.controller.model.FileInfo;
 import com.destrostudios.masterserver.database.schema.App;
 import com.destrostudios.masterserver.database.schema.AppFile;
 import org.springframework.beans.factory.annotation.Value;
@@ -39,27 +40,35 @@ public class AppFileService {
             }
         } else {
             String path = file.getPath().substring(getAppDirectoryPath(app).length()).replace("\\", "/");
-            String checksumSha256 = getChecksum(file, messageDigestSha256);
+            FileInfo fileInfo = getFileInfo(file);
             AppFile appFile = AppFile.builder()
                     .app(app)
                     .path(path)
-                    .checksumSha256(checksumSha256)
+                    .sizeBytes(fileInfo.getSizeBytes())
+                    .checksumSha256(fileInfo.getChecksumSha256())
                     .build();
             appFiles.add(appFile);
         }
     }
 
-    private static String getChecksum(File file, MessageDigest messageDigest) throws IOException {
+    private FileInfo getFileInfo(File file) throws IOException {
         byte[] buffer = new byte[8192];
+        long sizeBytes = 0;
         int count;
         BufferedInputStream bufferedInputStream = new BufferedInputStream(new FileInputStream(file));
         while ((count = bufferedInputStream.read(buffer)) > 0) {
-            messageDigest.update(buffer, 0, count);
+            sizeBytes += count;
+            messageDigestSha256.update(buffer, 0, count);
         }
         bufferedInputStream.close();
 
-        byte[] hash = messageDigest.digest();
-        return Base64.getEncoder().encodeToString(hash);
+        byte[] hash = messageDigestSha256.digest();
+        String checksumSha256 = Base64.getEncoder().encodeToString(hash);
+
+        return FileInfo.builder()
+                .sizeBytes(sizeBytes)
+                .checksumSha256(checksumSha256)
+                .build();
     }
 
     public File getFile(AppFile appFile) {

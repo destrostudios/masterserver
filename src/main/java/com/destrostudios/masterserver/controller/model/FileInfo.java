@@ -9,10 +9,8 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @Builder
 @Getter
-public class AppFileDTO {
+public class FileInfo {
 
-    private int id;
-    private String path;
     private long sizeBytes;
     private String checksumSha256;
 

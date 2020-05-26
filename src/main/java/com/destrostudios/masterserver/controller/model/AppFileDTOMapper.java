@@ -19,6 +19,7 @@ public class AppFileDTOMapper {
         return AppFileDTO.builder()
                 .id(appFile.getId())
                 .path(appFile.getPath())
+                .sizeBytes(appFile.getSizeBytes())
                 .checksumSha256(appFile.getChecksumSha256())
                 .build();
     }

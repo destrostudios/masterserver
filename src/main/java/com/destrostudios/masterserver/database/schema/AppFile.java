@@ -20,6 +20,7 @@ public class AppFile {
     @ManyToOne
     private App app;
     private String path;
+    private long sizeBytes;
     private String checksumSha256;
 
 }
