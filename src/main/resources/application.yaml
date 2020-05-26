@@ -3,6 +3,3 @@ management:
     web:
       exposure:
         include: health,info,prometheus,metrics
-
-apps:
-  directory: ./apps/

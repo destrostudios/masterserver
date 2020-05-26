@@ -10,9 +10,9 @@
     </parent>
     <groupId>com.destrostudios</groupId>
     <artifactId>masterserver</artifactId>
-    <version>0.0.1</version>
+    <version>1.0.0</version>
     <name>destrostudios Masterserver</name>
-    <description>Our masterserver, offering account management and the according APIs for the launcher and apps.</description>
+    <description>Destrostudios masterserver, offering account management and the according APIs for the launcher and apps.</description>
 
     <properties>
         <java.version>1.8</java.version>
@@ -75,6 +75,11 @@
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
+                <configuration>
+                    <profiles>
+                        <profile>prod</profile>
+                    </profiles>
+                </configuration>
             </plugin>
         </plugins>
     </build>

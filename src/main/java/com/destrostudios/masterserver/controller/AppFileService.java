@@ -18,7 +18,7 @@ import java.util.List;
 @Service
 public class AppFileService {
 
-    AppFileService(@Value("${apps.directory}") String appsDirectory) throws NoSuchAlgorithmException {
+    AppFileService(@Value("${appsDirectory}") String appsDirectory) throws NoSuchAlgorithmException {
         this.appsDirectory = appsDirectory;
         messageDigestSha256 = MessageDigest.getInstance("SHA-256");
     }
