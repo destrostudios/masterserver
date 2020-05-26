@@ -27,5 +27,6 @@ public class App {
     private LocalDate date;
     @Column(columnDefinition = "TEXT")
     private String description;
+    private String executable;
 
 }

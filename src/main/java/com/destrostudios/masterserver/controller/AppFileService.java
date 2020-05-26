@@ -2,6 +2,7 @@ package com.destrostudios.masterserver.controller;
 
 import com.destrostudios.masterserver.database.schema.App;
 import com.destrostudios.masterserver.database.schema.AppFile;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.io.BufferedInputStream;
@@ -17,11 +18,12 @@ import java.util.List;
 @Service
 public class AppFileService {
 
-    AppFileService() throws NoSuchAlgorithmException {
+    AppFileService(@Value("${apps.directory}") String appsDirectory) throws NoSuchAlgorithmException {
+        this.appsDirectory = appsDirectory;
         messageDigestSha256 = MessageDigest.getInstance("SHA-256");
     }
+    private String appsDirectory;
     private MessageDigest messageDigestSha256;
-    public static final String APPS_DIRECTORY = "./apps/";
 
     List<AppFile> generateAppFiles(App app) throws IOException {
         List<AppFile> appFiles = new LinkedList<>();
@@ -36,7 +38,7 @@ public class AppFileService {
                 addAppFiles(app, appFiles, subFile);
             }
         } else {
-            String path = file.getPath().substring(getAppDirectoryPath(app).length());
+            String path = file.getPath().substring(getAppDirectoryPath(app).length()).replace("\\", "/");
             String checksumSha256 = getChecksum(file, messageDigestSha256);
             AppFile appFile = AppFile.builder()
                     .app(app)
@@ -45,10 +47,6 @@ public class AppFileService {
                     .build();
             appFiles.add(appFile);
         }
-    }
-
-    private String getAppDirectoryPath(App app) {
-        return APPS_DIRECTORY + app.getName() + "/";
     }
 
     private static String getChecksum(File file, MessageDigest messageDigest) throws IOException {
@@ -66,5 +64,9 @@ public class AppFileService {
 
     public File getFile(AppFile appFile) {
         return new File(getAppDirectoryPath(appFile.getApp()) + appFile.getPath());
+    }
+
+    private String getAppDirectoryPath(App app) {
+        return appsDirectory + app.getName() + "/";
     }
 }
