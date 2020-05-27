@@ -12,6 +12,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.time.LocalDateTime;
 import java.util.Base64;
 import java.util.LinkedList;
 import java.util.List;
@@ -26,27 +27,30 @@ public class AppFileService {
     private String appsDirectory;
     private MessageDigest messageDigestSha256;
 
-    List<AppFile> generateAppFiles(App app) throws IOException {
+    List<AppFile> generateAppFiles(App app, List<AppFile> existingAppFiles) throws IOException {
         List<AppFile> appFiles = new LinkedList<>();
         File appDirectory = new File(getAppDirectoryPath(app));
-        addAppFiles(app, appFiles, appDirectory);
+        addAppFiles(app, existingAppFiles, appFiles, appDirectory);
         return appFiles;
     }
 
-    private void addAppFiles(App app, List<AppFile> appFiles, File file) throws IOException {
+    private void addAppFiles(App app, List<AppFile> existingAppFiles, List<AppFile> appFiles, File file) throws IOException {
         if (file.isDirectory()) {
             for (File subFile : file.listFiles()) {
-                addAppFiles(app, appFiles, subFile);
+                addAppFiles(app, existingAppFiles, appFiles, subFile);
             }
         } else {
             String path = file.getPath().substring(getAppDirectoryPath(app).length()).replace("\\", "/");
+            AppFile appFile = existingAppFiles.stream()
+                    .filter(existingAppFile -> existingAppFile.getPath().equals(path))
+                    .findAny().orElseGet(() -> AppFile.builder()
+                            .app(app)
+                            .path(path)
+                            .build());
             FileInfo fileInfo = getFileInfo(file);
-            AppFile appFile = AppFile.builder()
-                    .app(app)
-                    .path(path)
-                    .sizeBytes(fileInfo.getSizeBytes())
-                    .checksumSha256(fileInfo.getChecksumSha256())
-                    .build();
+            appFile.setSizeBytes(fileInfo.getSizeBytes());
+            appFile.setChecksumSha256(fileInfo.getChecksumSha256());
+            appFile.setDateTime(LocalDateTime.now());
             appFiles.add(appFile);
         }
     }

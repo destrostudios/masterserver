@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
 
@@ -89,8 +90,10 @@ public class AppController {
         int appId = Integer.parseInt(appIdString);
         App app = appRepository.findById(appId).get();
         List<AppFile> oldAppFiles = appFileRepository.findByApp(app);
-        List<AppFile> newAppFiles = appFileService.generateAppFiles(app);
-        appFileRepository.deleteAll(oldAppFiles);
+        List<AppFile> newAppFiles = appFileService.generateAppFiles(app, oldAppFiles);
+        List<AppFile> removedAppFiles = new LinkedList<>(oldAppFiles);
+        removedAppFiles.removeAll(newAppFiles);
+        appFileRepository.deleteAll(removedAppFiles);
         appFileRepository.saveAll(newAppFiles);
     }
 

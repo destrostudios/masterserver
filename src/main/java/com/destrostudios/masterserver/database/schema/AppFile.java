@@ -1,17 +1,16 @@
 package com.destrostudios.masterserver.database.schema;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import javax.persistence.*;
+import java.time.LocalDateTime;
 
 @Entity
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder(toBuilder = true)
 @Getter
+@Setter
 public class AppFile {
 
     @Id
@@ -22,5 +21,6 @@ public class AppFile {
     private String path;
     private long sizeBytes;
     private String checksumSha256;
+    private LocalDateTime dateTime;
 
 }
