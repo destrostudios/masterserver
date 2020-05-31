@@ -4,6 +4,7 @@ import com.auth0.jwt.JWT;
 import com.auth0.jwt.JWTVerifier;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.exceptions.JWTVerificationException;
+import com.auth0.jwt.interfaces.DecodedJWT;
 import com.destrostudios.masterserver.database.schema.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -52,12 +53,15 @@ public class AuthenticationController {
     }
 
     @GetMapping("/verify")
-    public boolean verifyAuthToken(@RequestParam String token) {
+    public ResponseEntity<?> verifyAuthToken(@RequestParam String token) {
         try {
-            verifier.verify(token);
-            return true;
+            DecodedJWT decodedJWT = verifier.verify(token);
+            Map<String, Object> claims = new HashMap<>();
+            claims.put("iat", decodedJWT.getClaim("iat").asInt());
+            claims.put("user", decodedJWT.getClaim("user").asMap());
+            return ResponseEntity.ok(claims);
         } catch (JWTVerificationException ex) {
-            return false;
+            return ResponseEntity.badRequest().body(ex.getMessage());
         }
     }
 }
