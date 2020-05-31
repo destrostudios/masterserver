@@ -21,10 +21,10 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/authToken")
-public class AuthenticationController {
+public class AuthTokenController {
 
     @Autowired
-    public AuthenticationController(KeyService keyService, SessionService sessionService, @Value("${keysDirectory}") String appsDirectory) {
+    public AuthTokenController(KeyService keyService, SessionService sessionService, @Value("${keysDirectory}") String appsDirectory) {
         this.sessionService = sessionService;
         KeyPair keyPair = keyService.readKeyPair("RSA", appsDirectory + "private.der", appsDirectory + "public.pem");
         algorithm = Algorithm.RSA256((RSAPublicKey) keyPair.getPublic(), (RSAPrivateKey) keyPair.getPrivate());
@@ -42,20 +42,20 @@ public class AuthenticationController {
             userMap.put("id", user.getId());
             userMap.put("login", user.getLogin());
 
-            String token = JWT.create()
+            String authToken = JWT.create()
                     .withIssuedAt(new Date())
                     .withClaim("user", userMap)
                     .sign(algorithm);
-            return ResponseEntity.ok(token);
+            return ResponseEntity.ok(authToken);
         } else {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
         }
     }
 
     @GetMapping("/verify")
-    public ResponseEntity<?> verifyAuthToken(@RequestParam String token) {
+    public ResponseEntity<?> verifyAuthToken(@RequestHeader String authToken) {
         try {
-            DecodedJWT decodedJWT = verifier.verify(token);
+            DecodedJWT decodedJWT = verifier.verify(authToken);
             Map<String, Object> claims = new HashMap<>();
             claims.put("iat", decodedJWT.getClaim("iat").asInt());
             claims.put("user", decodedJWT.getClaim("user").asMap());
