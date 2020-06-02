@@ -90,4 +90,23 @@ public class UserController {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
         }
     }
+
+    @GetMapping("/{userId}")
+    public UserDTO getUserById(@PathVariable("userId") String userIdString) {
+        int userId = Integer.parseInt(userIdString);
+        User user = userRepository.findById(userId).get();
+        return userDTOMapper.map(user);
+    }
+
+    @GetMapping("/byLogin")
+    public ResponseEntity<UserDTO> getUserByLogin(@RequestParam String login) {
+        Optional<User> userOptional = userRepository.findByLogin(login);
+        if (userOptional.isPresent()) {
+            User user = userOptional.get();
+            UserDTO userDTO = userDTOMapper.map(user);
+            return ResponseEntity.ok(userDTO);
+        } else {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        }
+    }
 }
