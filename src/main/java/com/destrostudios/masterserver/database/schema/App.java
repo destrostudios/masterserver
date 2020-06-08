@@ -22,7 +22,7 @@ public class App {
     private String name;
     @OneToOne
     private Developer developer;
-    @OneToMany
+    @ManyToMany
     private List<Genre> genres;
     private LocalDate date;
     @Column(columnDefinition = "TEXT")
