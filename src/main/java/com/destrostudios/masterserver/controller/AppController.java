@@ -39,12 +39,12 @@ public class AppController {
     private AppFileDTOMapper appFileDTOMapper;
 
     @GetMapping
-    public List<App> getSessionUser() {
+    public List<App> getApps() {
         return appRepository.findAll();
     }
 
     @GetMapping("/{appId}/addToAccount")
-    public ResponseEntity<App> addToAccount(@RequestHeader String sessionId, @PathVariable("appId") String appIdString) {
+    public ResponseEntity<Void> addToAccount(@RequestHeader String sessionId, @PathVariable("appId") String appIdString) {
         int appId = Integer.parseInt(appIdString);
         User user = sessionService.getUser(sessionId);
         if (user == null) {
@@ -67,7 +67,7 @@ public class AppController {
     }
 
     @GetMapping("/{appId}/removeFromAccount")
-    public ResponseEntity<App> removeFromAccount(@RequestHeader String sessionId, @PathVariable("appId") String appIdString) {
+    public ResponseEntity<Void> removeFromAccount(@RequestHeader String sessionId, @PathVariable("appId") String appIdString) {
         int appId = Integer.parseInt(appIdString);
         User user = sessionService.getUser(sessionId);
         if (user == null) {

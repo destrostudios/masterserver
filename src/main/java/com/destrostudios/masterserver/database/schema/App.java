@@ -28,5 +28,6 @@ public class App {
     @Column(columnDefinition = "TEXT")
     private String description;
     private String executable;
+    private boolean hidden;
 
 }
