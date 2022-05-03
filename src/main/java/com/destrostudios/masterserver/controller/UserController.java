@@ -3,7 +3,7 @@ package com.destrostudios.masterserver.controller;
 import com.destrostudios.masterserver.controller.model.Credentials;
 import com.destrostudios.masterserver.controller.model.Registration;
 import com.destrostudios.masterserver.controller.model.UserDTO;
-import com.destrostudios.masterserver.controller.model.UserDTOMapper;
+import com.destrostudios.masterserver.controller.model.UserMapper;
 import com.destrostudios.masterserver.database.UserSessionRepository;
 import com.destrostudios.masterserver.database.schema.User;
 import com.destrostudios.masterserver.database.schema.UserSession;
@@ -29,7 +29,7 @@ public class UserController {
     @Autowired
     private SessionService sessionService;
     @Autowired
-    private UserDTOMapper userDTOMapper;
+    private UserMapper userMapper;
 
     @PostMapping("/register")
     public ResponseEntity<Void> prepareRegistration(@RequestBody Registration registration) {
@@ -84,7 +84,7 @@ public class UserController {
     public ResponseEntity<UserDTO> getSessionUser(@RequestHeader String sessionId) {
         User user = sessionService.getUser(sessionId);
         if (user != null) {
-            UserDTO userDTO = userDTOMapper.map(user);
+            UserDTO userDTO = userMapper.map(user);
             return ResponseEntity.ok(userDTO);
         } else {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
@@ -95,7 +95,7 @@ public class UserController {
     public UserDTO getUserById(@PathVariable("userId") String userIdString) {
         int userId = Integer.parseInt(userIdString);
         User user = userRepository.findById(userId).get();
-        return userDTOMapper.map(user);
+        return userMapper.map(user);
     }
 
     @GetMapping("/byLogin")
@@ -103,7 +103,7 @@ public class UserController {
         Optional<User> userOptional = userRepository.findByLogin(login);
         if (userOptional.isPresent()) {
             User user = userOptional.get();
-            UserDTO userDTO = userDTOMapper.map(user);
+            UserDTO userDTO = userMapper.map(user);
             return ResponseEntity.ok(userDTO);
         } else {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();

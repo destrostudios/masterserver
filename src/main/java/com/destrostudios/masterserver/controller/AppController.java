@@ -1,14 +1,12 @@
 package com.destrostudios.masterserver.controller;
 
-import com.destrostudios.masterserver.controller.model.AppFileDTO;
-import com.destrostudios.masterserver.controller.model.AppFileDTOMapper;
+import com.destrostudios.masterserver.controller.model.AppFileMapper;
+import com.destrostudios.masterserver.controller.model.AppFilesResponse;
+import com.destrostudios.masterserver.database.AppFileProtectionRepository;
 import com.destrostudios.masterserver.database.AppFileRepository;
 import com.destrostudios.masterserver.database.AppOwnershipRepository;
 import com.destrostudios.masterserver.database.AppRepository;
-import com.destrostudios.masterserver.database.schema.App;
-import com.destrostudios.masterserver.database.schema.AppFile;
-import com.destrostudios.masterserver.database.schema.AppOwnership;
-import com.destrostudios.masterserver.database.schema.User;
+import com.destrostudios.masterserver.database.schema.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.http.HttpStatus;
@@ -32,11 +30,13 @@ public class AppController {
     @Autowired
     private AppFileRepository appFileRepository;
     @Autowired
+    private AppFileProtectionRepository appFileProtectionRepository;
+    @Autowired
     private SessionService sessionService;
     @Autowired
     private AppFileService appFileService;
     @Autowired
-    private AppFileDTOMapper appFileDTOMapper;
+    private AppFileMapper appFileMapper;
 
     @GetMapping
     public List<App> getApps() {
@@ -98,14 +98,15 @@ public class AppController {
     }
 
     @GetMapping("/{appId}/files")
-    public ResponseEntity<List<AppFileDTO>> getFiles(@PathVariable("appId") String appIdString) {
+    public ResponseEntity<AppFilesResponse> getFiles(@PathVariable("appId") String appIdString) {
         int appId = Integer.parseInt(appIdString);
         Optional<App> appOptional = appRepository.findById(appId);
         if (appOptional.isPresent()) {
             App app = appOptional.get();
             List<AppFile> appFiles = appFileRepository.findByApp(app);
-            List<AppFileDTO> appFileDTOs = appFileDTOMapper.map(appFiles);
-            return ResponseEntity.ok(appFileDTOs);
+            List<AppFileProtection> appFileProtections = appFileProtectionRepository.findByApp(app);
+            AppFilesResponse response = appFileMapper.mapResponse(appFiles, appFileProtections);
+            return ResponseEntity.ok(response);
         } else {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         }

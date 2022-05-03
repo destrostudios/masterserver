@@ -7,7 +7,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
-public class UserDTOMapper {
+public class UserMapper {
 
     public UserDTO map(User user) {
         List<Integer> ownedAppIds = user.getAppOwnerships().stream()
