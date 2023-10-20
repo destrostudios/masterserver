@@ -1,11 +1,11 @@
 package com.destrostudios.masterserver.database.schema;
 
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-import jakarta.persistence.*;
 import java.time.LocalDate;
 import java.util.List;
 
