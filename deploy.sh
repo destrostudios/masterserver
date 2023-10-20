@@ -11,8 +11,10 @@ fi
 
 # Build
 cp "${TARGET}application-prod.properties" src/main/resources/application-prod.properties
-mvn clean install
+export JAVA_HOME=/usr/lib/jvm/java-17-openjdk-amd64;mvn clean install
 
 # Deploy
 mv target/masterserver-1.0.0.jar "${TARGET}destrostudios.jar"
-sh "${TARGET}control.sh" restart
+mv ecosystem.config.js "${TARGET}"
+cd "${TARGET}"
+pm2 restart ecosystem.config.js

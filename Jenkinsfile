@@ -5,7 +5,7 @@ node {
                 checkout scm
             }
             stage('Build') {
-                sh 'mvn clean install'
+                sh 'export JAVA_HOME=/usr/lib/jvm/java-17-openjdk-amd64;mvn clean install'
             }
         } finally {
             cleanWs()

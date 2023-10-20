@@ -1,6 +1,6 @@
 package com.destrostudios.masterserver.controller;
 
-import org.bouncycastle.openssl.PEMReader;
+import org.bouncycastle.openssl.PEMParser;
 import org.springframework.stereotype.Service;
 
 import java.io.*;
@@ -36,8 +36,8 @@ public class KeyService {
     }
 
     private PublicKey readPublicKey(String filePath, KeyFactory keyFactory) throws IOException, InvalidKeySpecException {
-        PEMReader pemReader = new PEMReader(new FileReader(filePath));
-        byte[] publicKeyBytes = pemReader.readPemObject().getContent();
+        PEMParser pemParser = new PEMParser(new FileReader(filePath));
+        byte[] publicKeyBytes = pemParser.readPemObject().getContent();
         return keyFactory.generatePublic(new X509EncodedKeySpec(publicKeyBytes));
     }
 }

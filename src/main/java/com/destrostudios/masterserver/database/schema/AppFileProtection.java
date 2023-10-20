@@ -1,8 +1,7 @@
 package com.destrostudios.masterserver.database.schema;
 
+import jakarta.persistence.*;
 import lombok.*;
-
-import javax.persistence.*;
 
 @Entity
 @NoArgsConstructor

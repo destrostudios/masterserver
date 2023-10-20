@@ -2,7 +2,7 @@ package com.destrostudios.masterserver.database.schema;
 
 import lombok.*;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
 import java.time.LocalDateTime;
 
 @Entity
