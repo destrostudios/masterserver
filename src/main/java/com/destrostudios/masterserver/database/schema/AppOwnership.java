@@ -16,7 +16,7 @@ import java.time.LocalDateTime;
 public class AppOwnership {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
     @ManyToOne
     private User user;

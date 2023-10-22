@@ -12,7 +12,7 @@ import lombok.*;
 public class AppFileProtection {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
     @ManyToOne
     private App app;
