@@ -7,7 +7,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 class TestUniverse {
 
 	@Test
-	void universeShouldBeStable() {
+	void shouldBeStable() {
 		assertEquals(42, 42);
 	}
 }
