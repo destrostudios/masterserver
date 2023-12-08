@@ -1,4 +1,4 @@
-package com.destrostudios.masterserver.controller.model;
+package com.destrostudios.masterserver.model;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -9,9 +9,9 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @Builder
 @Getter
-public class Credentials {
+public class FileInfo {
 
-    private String login;
-    private String hashedPassword;
+    private long sizeBytes;
+    private String checksumSha256;
 
 }

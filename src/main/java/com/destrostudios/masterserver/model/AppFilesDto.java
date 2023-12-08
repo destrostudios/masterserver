@@ -1,4 +1,4 @@
-package com.destrostudios.masterserver.controller.model;
+package com.destrostudios.masterserver.model;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -11,9 +11,9 @@ import java.util.List;
 @AllArgsConstructor
 @Builder
 @Getter
-public class AppFilesResponse {
+public class AppFilesDto {
 
-    private List<AppFileDTO> files;
+    private List<AppFileDto> files;
     private List<String> protections;
 
 }

@@ -23,7 +23,7 @@ public class NewsController {
     }
 
     @GetMapping("/latest")
-    public List<News> getLatestNews(@RequestParam("limit") int limit) {
+    public List<News> getLatestNews(@RequestParam int limit) {
         return newsRepository.findNewest(limit);
     }
 }

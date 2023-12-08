@@ -1,17 +1,15 @@
 package com.destrostudios.masterserver.database.schema;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.util.List;
 
 @Entity
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder(toBuilder = true)
+@Builder
+@Setter
 @Getter
 public class User {
 
@@ -19,6 +17,9 @@ public class User {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
     private String login;
+    private String email;
+    private String emailSecret;
+    private boolean emailConfirmed;
     private String saltClient;
     private String saltServer;
     private String hashedPassword;

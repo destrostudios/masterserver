@@ -4,10 +4,10 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-class TestMasterserverApplication {
+class TestUniverse {
 
 	@Test
-	void univerShouldBeStable() {
+	void universeShouldBeStable() {
 		assertEquals(42, 42);
 	}
 }

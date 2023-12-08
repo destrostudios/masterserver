@@ -1,112 +1,62 @@
 package com.destrostudios.masterserver.controller;
 
-import com.destrostudios.masterserver.controller.model.Credentials;
-import com.destrostudios.masterserver.controller.model.Registration;
-import com.destrostudios.masterserver.controller.model.UserDTO;
-import com.destrostudios.masterserver.controller.model.UserMapper;
-import com.destrostudios.masterserver.database.UserSessionRepository;
 import com.destrostudios.masterserver.database.schema.User;
-import com.destrostudios.masterserver.database.schema.UserSession;
-import com.destrostudios.masterserver.database.UserRepository;
+import com.destrostudios.masterserver.model.*;
+import com.destrostudios.masterserver.service.UserService;
+import com.destrostudios.masterserver.service.exceptions.UserAlreadyExistsException;
+import com.destrostudios.masterserver.service.exceptions.UserNotFoundException;
+import com.destrostudios.masterserver.service.exceptions.WrongEmailSecretException;
+import com.destrostudios.masterserver.service.exceptions.WrongPasswordException;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.security.crypto.bcrypt.BCrypt;
 import org.springframework.web.bind.annotation.*;
-
-import java.time.LocalDateTime;
-import java.util.Optional;
-import java.util.UUID;
 
 @RestController
 @RequestMapping("/users")
 public class UserController {
 
     @Autowired
-    private UserRepository userRepository;
+    private UserService userService;
     @Autowired
-    private UserSessionRepository userSessionRepository;
-    @Autowired
-    private SessionService sessionService;
-    @Autowired
-    private UserMapper userMapper;
+    private UserDtoMapper userDtoMapper;
 
     @PostMapping("/register")
-    public ResponseEntity<Void> prepareRegistration(@RequestBody Registration registration) {
-        Optional<User> existingUser = userRepository.findByLogin(registration.getLogin());
-        if (existingUser.isPresent()) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
-        } else {
-            String saltServer = BCrypt.gensalt(10);
-            String hashedPassword = BCrypt.hashpw(registration.getHashedPassword(), saltServer);
-            User user = User.builder()
-                    .login(registration.getLogin())
-                    .saltClient(registration.getSaltClient())
-                    .saltServer(saltServer)
-                    .hashedPassword(hashedPassword)
-                    .build();
-            userRepository.save(user);
-            return ResponseEntity.ok().build();
-        }
+    public void register(@RequestBody RegistrationDto registrationDto) throws UserAlreadyExistsException {
+        userService.register(registrationDto);
     }
 
-    @PostMapping("/saltClient")
-    public ResponseEntity<String> getSaltClient(@RequestBody String login) {
-        Optional<String> saltClientOptional = userRepository.findSaltClientByLogin(login);
-        if (saltClientOptional.isPresent()) {
-            return ResponseEntity.ok(saltClientOptional.get());
-        } else {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
-        }
+    @PostMapping("/{login}/sendEmailConfirmationEmail")
+    public void sendEmailConfirmationEmail(@PathVariable String login) throws UserNotFoundException {
+        userService.sendEmailConfirmationEmail(login);
+    }
+
+    @PostMapping("/{userId}/confirmEmail")
+    public void confirmEmail(@PathVariable int userId, @RequestParam String secret) throws UserNotFoundException, WrongEmailSecretException {
+        userService.confirmEmail(userId, secret);
+    }
+
+    @PostMapping("/{login}/sendPasswordResetEmail")
+    public void sendPasswordResetEmail(@PathVariable String login) throws UserNotFoundException {
+        userService.sendPasswordResetEmail(login);
+    }
+
+    @PostMapping("/{userId}/resetPassword")
+    public void resetPassword(@PathVariable int userId, @RequestBody ResetPasswordDto resetPasswordDto) throws UserNotFoundException, WrongEmailSecretException {
+        userService.resetPassword(userId, resetPasswordDto.getEmailSecret(), resetPasswordDto.getClientHashedPassword());
+    }
+
+    @GetMapping("/{login}/saltClient")
+    public String getSaltClient(@PathVariable String login) throws UserNotFoundException {
+        return userService.getSaltClient(login);
     }
 
     @PostMapping("/login")
-    public ResponseEntity<String> login(@RequestBody Credentials credentials) {
-        Optional<User> userOptional = userRepository.findByLogin(credentials.getLogin());
-        if (userOptional.isPresent()) {
-            User user = userOptional.get();
-            String hashedPassword = BCrypt.hashpw(credentials.getHashedPassword(), user.getSaltServer());
-            if (hashedPassword.equals(user.getHashedPassword())) {
-                final String sessionId = UUID.randomUUID().toString();
-                UserSession userSession = UserSession.builder()
-                        .id(sessionId)
-                        .user(user)
-                        .startTime(LocalDateTime.now())
-                        .build();
-                userSessionRepository.save(userSession);
-                return ResponseEntity.ok(sessionId);
-            }
-        }
-        return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+    public String login(@RequestBody LoginDto loginDto) throws UserNotFoundException, WrongPasswordException {
+        return userService.login(loginDto.getLogin(), loginDto.getClientHashedPassword());
     }
 
-    @GetMapping("/bySession")
-    public ResponseEntity<UserDTO> getSessionUser(@RequestHeader String sessionId) {
-        User user = sessionService.getUser(sessionId);
-        if (user != null) {
-            UserDTO userDTO = userMapper.map(user);
-            return ResponseEntity.ok(userDTO);
-        } else {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
-        }
-    }
-
-    @GetMapping("/{userId}")
-    public UserDTO getUserById(@PathVariable("userId") String userIdString) {
-        int userId = Integer.parseInt(userIdString);
-        User user = userRepository.findById(userId).get();
-        return userMapper.map(user);
-    }
-
-    @GetMapping("/byLogin")
-    public ResponseEntity<UserDTO> getUserByLogin(@RequestParam String login) {
-        Optional<User> userOptional = userRepository.findByLogin(login);
-        if (userOptional.isPresent()) {
-            User user = userOptional.get();
-            UserDTO userDTO = userMapper.map(user);
-            return ResponseEntity.ok(userDTO);
-        } else {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
-        }
+    @GetMapping("/{userIdOrLogin}")
+    public UserDto getUser(@PathVariable String userIdOrLogin) throws UserNotFoundException {
+        User user = userService.getUserByIdOrLogin(userIdOrLogin);
+        return userDtoMapper.map(user);
     }
 }

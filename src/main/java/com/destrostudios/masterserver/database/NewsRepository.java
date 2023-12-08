@@ -13,5 +13,4 @@ public interface NewsRepository extends JpaRepository<News, Integer> {
 
     @Query(value = "SELECT * FROM news ORDER BY date_time DESC LIMIT :limit", nativeQuery = true)
     List<News> findNewest(@Param("limit") int limit);
-
 }

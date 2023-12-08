@@ -1,4 +1,4 @@
-package com.destrostudios.masterserver.controller;
+package com.destrostudios.masterserver.service;
 
 import org.bouncycastle.openssl.PEMParser;
 import org.springframework.stereotype.Service;
@@ -12,15 +12,14 @@ import java.security.spec.X509EncodedKeySpec;
 @Service
 public class KeyService {
 
-    KeyPair readKeyPair(String algorithm, String filePathPrivateKey, String filePathPublicKey) {
+    public KeyPair readKeyPair(String algorithm, String filePathPrivateKey, String filePathPublicKey) {
         try {
             KeyFactory keyFactory = KeyFactory.getInstance(algorithm);
             PrivateKey privateKey = readPrivateKey(filePathPrivateKey, keyFactory);
             PublicKey publicKey = readPublicKey(filePathPublicKey, keyFactory);
             return new KeyPair(publicKey, privateKey);
         } catch (IOException | NoSuchAlgorithmException | InvalidKeySpecException ex) {
-            ex.printStackTrace();
-            return null;
+            throw new RuntimeException(ex);
         }
     }
 

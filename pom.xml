@@ -5,7 +5,7 @@
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>3.1.5</version>
+        <version>3.2.0</version>
         <relativePath/>
     </parent>
     <groupId>com.destrostudios</groupId>
@@ -15,9 +15,7 @@
     <description>Destrostudios masterserver, offering account management and the according APIs for the launcher and apps.</description>
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <maven.compiler.source>17</maven.compiler.source>
-        <maven.compiler.target>17</maven.compiler.target>
-        <version.bouncycastle>1.76</version.bouncycastle>
+        <version.bouncycastle>1.77</version.bouncycastle>
         <version.java-jwt>4.4.0</version.java-jwt>
         <version.lombok>1.18.30</version.lombok>
         <version.maven-compiler-plugin>3.11.0</version.maven-compiler-plugin>
@@ -34,10 +32,6 @@
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-actuator</artifactId>
-        </dependency>
-        <dependency>
             <groupId>org.springframework.security</groupId>
             <artifactId>spring-security-web</artifactId>
         </dependency>
@@ -50,6 +44,11 @@
             <groupId>com.mysql</groupId>
             <artifactId>mysql-connector-j</artifactId>
             <scope>runtime</scope>
+        </dependency>
+        <!--Mail-->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-mail</artifactId>
         </dependency>
         <!--JWT-->
         <dependency>

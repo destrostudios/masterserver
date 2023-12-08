@@ -15,5 +15,4 @@ public interface UserRepository extends JpaRepository<User, Integer> {
 
     @Query(value = "SELECT salt_client FROM user WHERE login = :login", nativeQuery = true)
     Optional<String> findSaltClientByLogin(@Param("login") String login);
-
 }

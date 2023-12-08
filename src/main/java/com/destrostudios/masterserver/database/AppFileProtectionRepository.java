@@ -11,5 +11,4 @@ import java.util.List;
 public interface AppFileProtectionRepository extends JpaRepository<AppFileProtection, Integer> {
 
     List<AppFileProtection> findByApp(App app);
-
 }

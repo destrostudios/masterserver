@@ -1,4 +1,4 @@
-package com.destrostudios.masterserver.controller.model;
+package com.destrostudios.masterserver.model;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -9,10 +9,9 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @Builder
 @Getter
-public class Registration {
+public class LoginDto {
 
     private String login;
-    private String saltClient;
-    private String hashedPassword;
+    private String clientHashedPassword;
 
 }

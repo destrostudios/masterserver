@@ -1,15 +1,12 @@
-package com.destrostudios.masterserver.controller;
+package com.destrostudios.masterserver.service;
 
-import com.destrostudios.masterserver.controller.model.FileInfo;
+import com.destrostudios.masterserver.model.FileInfo;
 import com.destrostudios.masterserver.database.schema.App;
 import com.destrostudios.masterserver.database.schema.AppFile;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-import java.io.BufferedInputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
+import java.io.*;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.time.LocalDateTime;
@@ -20,14 +17,14 @@ import java.util.List;
 @Service
 public class AppFileService {
 
-    AppFileService(@Value("${appsDirectory}") String appsDirectory) throws NoSuchAlgorithmException {
+    public AppFileService(@Value("${destrostudios.apps-directory}") String appsDirectory) throws NoSuchAlgorithmException {
         this.appsDirectory = appsDirectory;
         messageDigestSha256 = MessageDigest.getInstance("SHA-256");
     }
     private String appsDirectory;
     private MessageDigest messageDigestSha256;
 
-    List<AppFile> generateAppFiles(App app, List<AppFile> existingAppFiles) throws IOException {
+    public List<AppFile> generateAppFiles(App app, List<AppFile> existingAppFiles) throws IOException {
         List<AppFile> appFiles = new LinkedList<>();
         File appDirectory = new File(getAppDirectoryPath(app));
         addAppFiles(app, existingAppFiles, appFiles, appDirectory);
@@ -42,11 +39,11 @@ public class AppFileService {
         } else {
             String path = file.getPath().substring(getAppDirectoryPath(app).length()).replace("\\", "/");
             AppFile appFile = existingAppFiles.stream()
-                    .filter(existingAppFile -> existingAppFile.getPath().equals(path))
-                    .findAny().orElseGet(() -> AppFile.builder()
-                            .app(app)
-                            .path(path)
-                            .build());
+                .filter(existingAppFile -> existingAppFile.getPath().equals(path))
+                .findAny().orElseGet(() -> AppFile.builder()
+                    .app(app)
+                    .path(path)
+                    .build());
             FileInfo fileInfo = getFileInfo(file);
             appFile.setSizeBytes(fileInfo.getSizeBytes());
             appFile.setChecksumSha256(fileInfo.getChecksumSha256());
@@ -70,9 +67,9 @@ public class AppFileService {
         String checksumSha256 = Base64.getEncoder().encodeToString(hash);
 
         return FileInfo.builder()
-                .sizeBytes(sizeBytes)
-                .checksumSha256(checksumSha256)
-                .build();
+            .sizeBytes(sizeBytes)
+            .checksumSha256(checksumSha256)
+            .build();
     }
 
     public File getFile(AppFile appFile) {

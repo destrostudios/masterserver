@@ -1,20 +1,19 @@
-package com.destrostudios.masterserver.controller.model;
+package com.destrostudios.masterserver.model;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-import java.util.List;
-
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
 @Getter
-public class UserDTO {
+public class RegistrationDto {
 
-    private int id;
     private String login;
-    private List<Integer> ownedAppIds;
+    private String email;
+    private String saltClient;
+    private String clientHashedPassword;
 
 }
