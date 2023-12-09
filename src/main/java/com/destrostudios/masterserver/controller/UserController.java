@@ -17,7 +17,7 @@ public class UserController {
     private UserDtoMapper userDtoMapper;
 
     @PostMapping("/register")
-    public void register(@RequestBody RegistrationDto registrationDto) throws LoginAlreadyExistsException, EmailAlreadyExistsException {
+    public void register(@RequestBody RegistrationDto registrationDto) throws BadRequestException, LoginAlreadyExistsException, EmailAlreadyExistsException {
         userService.register(registrationDto);
     }
 
@@ -48,7 +48,7 @@ public class UserController {
 
     @PostMapping("/login")
     public String login(@RequestBody LoginDto loginDto) throws UserNotFoundException, WrongPasswordException {
-        return userService.login(loginDto.getLogin(), loginDto.getClientHashedPassword());
+        return userService.login(loginDto);
     }
 
     @GetMapping("/{userIdOrLogin}")

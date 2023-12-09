@@ -54,12 +54,32 @@ class TestIntegration {
 		}
 
 		@Test
-		public void registerUserLoginAlreadyExists() {
+		public void registerNoLogin() {
+			post("/users/register", new RegistrationDto("", "myEmail", "mySaltClient", "myClientHashedPassword"), Void.class, HttpStatus.BAD_REQUEST);
+		}
+
+		@Test
+		public void registerNoEmail() {
+			post("/users/register", new RegistrationDto("myLogin", "", "mySaltClient", "myClientHashedPassword"), Void.class, HttpStatus.BAD_REQUEST);
+		}
+
+		@Test
+		public void registerNoSaltClient() {
+			post("/users/register", new RegistrationDto("myLogin", "myEmail", "", "myClientHashedPassword"), Void.class, HttpStatus.BAD_REQUEST);
+		}
+
+		@Test
+		public void registerNoClientHashedPassword() {
+			post("/users/register", new RegistrationDto("myLogin", "myEmail", "mySaltClient", ""), Void.class, HttpStatus.BAD_REQUEST);
+		}
+
+		@Test
+		public void registerLoginAlreadyExists() {
 			post("/users/register", new RegistrationDto("destroflyer", "myEmail", "mySaltClient", "myClientHashedPassword"), Void.class, HttpStatus.FORBIDDEN);
 		}
 
 		@Test
-		public void registerUserEmailAlreadyExists() {
+		public void registerEmailAlreadyExists() {
 			post("/users/register", new RegistrationDto("myLogin", "destro-flyer@web.de", "mySaltClient", "myClientHashedPassword"), Void.class, HttpStatus.FORBIDDEN);
 		}
 

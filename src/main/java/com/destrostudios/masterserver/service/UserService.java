@@ -2,6 +2,7 @@ package com.destrostudios.masterserver.service;
 
 import com.destrostudios.masterserver.database.UserRepository;
 import com.destrostudios.masterserver.database.schema.User;
+import com.destrostudios.masterserver.model.LoginDto;
 import com.destrostudios.masterserver.model.RegistrationDto;
 import com.destrostudios.masterserver.service.exceptions.*;
 import jakarta.transaction.Transactional;
@@ -12,6 +13,8 @@ import org.springframework.stereotype.Service;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.function.Consumer;
+
+import static org.springframework.util.ObjectUtils.isEmpty;
 
 @Service
 public class UserService {
@@ -24,7 +27,10 @@ public class UserService {
     private EmailService emailService;
 
     @Transactional
-    public void register(RegistrationDto registrationDto) throws LoginAlreadyExistsException, EmailAlreadyExistsException {
+    public void register(RegistrationDto registrationDto) throws BadRequestException, LoginAlreadyExistsException, EmailAlreadyExistsException {
+        if (isEmpty(registrationDto.getLogin()) || isEmpty(registrationDto.getEmail()) || isEmpty(registrationDto.getSaltClient()) || isEmpty(registrationDto.getClientHashedPassword())) {
+            throw new BadRequestException();
+        }
         Optional<User> loginUser = userRepository.findByLogin(registrationDto.getLogin());
         if (loginUser.isPresent()) {
             throw new LoginAlreadyExistsException();
@@ -92,9 +98,9 @@ public class UserService {
         return userRepository.findSaltClientByLogin(login).orElseThrow(UserNotFoundException::new);
     }
 
-    public String login(String login, String clientHashedPassword) throws UserNotFoundException, WrongPasswordException {
-        User user = getUserByLogin(login);
-        String hashedPassword = hashSecret(clientHashedPassword, user.getSaltServer());
+    public String login(LoginDto loginDto) throws UserNotFoundException, WrongPasswordException {
+        User user = getUserByLogin(loginDto.getLogin());
+        String hashedPassword = hashSecret(loginDto.getClientHashedPassword(), user.getSaltServer());
         if (hashedPassword.equals(user.getHashedPassword())) {
             return authTokenService.signToken(user);
         }
