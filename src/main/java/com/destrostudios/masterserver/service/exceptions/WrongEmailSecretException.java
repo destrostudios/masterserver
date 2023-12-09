@@ -5,6 +5,6 @@ import org.springframework.http.HttpStatus;
 public class WrongEmailSecretException extends BaseException {
 
     public WrongEmailSecretException() {
-        super("WRONG_EMAIL_SECRET", "Wrong email secret", HttpStatus.UNAUTHORIZED);
+        super("WRONG_EMAIL_SECRET", "Wrong email secret", HttpStatus.FORBIDDEN);
     }
 }

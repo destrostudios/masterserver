@@ -47,7 +47,7 @@ public class UserController {
     }
 
     @PostMapping("/login")
-    public String login(@RequestBody LoginDto loginDto) throws UserNotFoundException, WrongPasswordException {
+    public String login(@RequestBody LoginDto loginDto) throws UserNotFoundException, WrongPasswordException, EmailNotConfirmedException {
         return userService.login(loginDto);
     }
 

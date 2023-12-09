@@ -95,7 +95,7 @@ class TestIntegration {
 
 		@Test
 		public void confirmEmailWrongSecret() {
-			post("/users/1/confirmEmail?secret=mySecret", null, Void.class, HttpStatus.UNAUTHORIZED);
+			post("/users/1/confirmEmail?secret=mySecret", null, Void.class, HttpStatus.FORBIDDEN);
 		}
 
 		@Test
@@ -110,7 +110,7 @@ class TestIntegration {
 
 		@Test
 		public void resetPasswordWrongSecret() {
-			post("/users/1/resetPassword", new ResetPasswordDto("myEmailSecret", "myClientHashedPassword"), Void.class, HttpStatus.UNAUTHORIZED);
+			post("/users/1/resetPassword", new ResetPasswordDto("myEmailSecret", "myClientHashedPassword"), Void.class, HttpStatus.FORBIDDEN);
 		}
 
 		@Test
@@ -121,6 +121,13 @@ class TestIntegration {
 		@Test
 		public void loginUserNotFound() {
 			post("/users/login", new LoginDto("thisLoginDoesNotExist", "myClientHashedPassword"), String.class, HttpStatus.NOT_FOUND);
+		}
+
+		@Test
+		public void getSaltClientAndLoginWrongPassword() {
+			String saltClient = get("/users/destroflyer/saltClient", String.class, HttpStatus.OK);
+			String clientHashedPassword = BCrypt.hashpw("wrongPassword", saltClient);
+			post("/users/login", new LoginDto("destroflyer", clientHashedPassword), String.class, HttpStatus.FORBIDDEN);
 		}
 
 		@Test
@@ -253,8 +260,8 @@ class TestIntegration {
 
 	private String login() {
 		String saltClient = get("/users/destroflyer/saltClient", String.class, HttpStatus.OK);
-		String hashedPassword = BCrypt.hashpw("test", saltClient);
-		return post("/users/login", new LoginDto("destroflyer", hashedPassword), String.class, HttpStatus.OK);
+		String clientHashedPassword = BCrypt.hashpw("test", saltClient);
+		return post("/users/login", new LoginDto("destroflyer", clientHashedPassword), String.class, HttpStatus.OK);
 	}
 
 	private <T> HttpEntity<T> getSingleHeaderRequestEntity(T body, String headerName, String headerValue) {

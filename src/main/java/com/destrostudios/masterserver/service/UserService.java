@@ -98,13 +98,16 @@ public class UserService {
         return userRepository.findSaltClientByLogin(login).orElseThrow(UserNotFoundException::new);
     }
 
-    public String login(LoginDto loginDto) throws UserNotFoundException, WrongPasswordException {
+    public String login(LoginDto loginDto) throws UserNotFoundException, WrongPasswordException, EmailNotConfirmedException {
         User user = getUserByLogin(loginDto.getLogin());
         String hashedPassword = hashSecret(loginDto.getClientHashedPassword(), user.getSaltServer());
-        if (hashedPassword.equals(user.getHashedPassword())) {
-            return authTokenService.signToken(user);
+        if (!hashedPassword.equals(user.getHashedPassword())) {
+            throw new WrongPasswordException();
         }
-        throw new WrongPasswordException();
+        if (!user.isEmailConfirmed()) {
+            throw new EmailNotConfirmedException();
+        }
+        return authTokenService.signToken(user);
     }
 
     public User getUserByIdOrLogin(String idOrLogin) throws UserNotFoundException {
