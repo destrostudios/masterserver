@@ -13,6 +13,8 @@ public interface UserRepository extends JpaRepository<User, Integer> {
 
     Optional<User> findByLogin(String login);
 
+    Optional<User> findByEmail(String email);
+
     @Query(value = "SELECT salt_client FROM user WHERE login = :login", nativeQuery = true)
     Optional<String> findSaltClientByLogin(@Param("login") String login);
 }

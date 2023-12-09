@@ -3,10 +3,7 @@ package com.destrostudios.masterserver.controller;
 import com.destrostudios.masterserver.database.schema.User;
 import com.destrostudios.masterserver.model.*;
 import com.destrostudios.masterserver.service.UserService;
-import com.destrostudios.masterserver.service.exceptions.UserAlreadyExistsException;
-import com.destrostudios.masterserver.service.exceptions.UserNotFoundException;
-import com.destrostudios.masterserver.service.exceptions.WrongEmailSecretException;
-import com.destrostudios.masterserver.service.exceptions.WrongPasswordException;
+import com.destrostudios.masterserver.service.exceptions.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -20,7 +17,7 @@ public class UserController {
     private UserDtoMapper userDtoMapper;
 
     @PostMapping("/register")
-    public void register(@RequestBody RegistrationDto registrationDto) throws UserAlreadyExistsException {
+    public void register(@RequestBody RegistrationDto registrationDto) throws LoginAlreadyExistsException, EmailAlreadyExistsException {
         userService.register(registrationDto);
     }
 

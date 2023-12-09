@@ -3,10 +3,7 @@ package com.destrostudios.masterserver.service;
 import com.destrostudios.masterserver.database.UserRepository;
 import com.destrostudios.masterserver.database.schema.User;
 import com.destrostudios.masterserver.model.RegistrationDto;
-import com.destrostudios.masterserver.service.exceptions.UserAlreadyExistsException;
-import com.destrostudios.masterserver.service.exceptions.UserNotFoundException;
-import com.destrostudios.masterserver.service.exceptions.WrongEmailSecretException;
-import com.destrostudios.masterserver.service.exceptions.WrongPasswordException;
+import com.destrostudios.masterserver.service.exceptions.*;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCrypt;
@@ -27,10 +24,14 @@ public class UserService {
     private EmailService emailService;
 
     @Transactional
-    public void register(RegistrationDto registrationDto) throws UserAlreadyExistsException {
-        Optional<User> existingUser = userRepository.findByLogin(registrationDto.getLogin());
-        if (existingUser.isPresent()) {
-            throw new UserAlreadyExistsException();
+    public void register(RegistrationDto registrationDto) throws LoginAlreadyExistsException, EmailAlreadyExistsException {
+        Optional<User> loginUser = userRepository.findByLogin(registrationDto.getLogin());
+        if (loginUser.isPresent()) {
+            throw new LoginAlreadyExistsException();
+        }
+        Optional<User> emailUser = userRepository.findByEmail(registrationDto.getEmail());
+        if (emailUser.isPresent()) {
+            throw new EmailAlreadyExistsException();
         }
         String saltServer = generateSalt();
         String hashedPassword = hashSecret(registrationDto.getClientHashedPassword(), saltServer);

@@ -54,8 +54,13 @@ class TestIntegration {
 		}
 
 		@Test
-		public void registerUserAlreadyExists() {
+		public void registerUserLoginAlreadyExists() {
 			post("/users/register", new RegistrationDto("destroflyer", "myEmail", "mySaltClient", "myClientHashedPassword"), Void.class, HttpStatus.FORBIDDEN);
+		}
+
+		@Test
+		public void registerUserEmailAlreadyExists() {
+			post("/users/register", new RegistrationDto("myLogin", "destro-flyer@web.de", "mySaltClient", "myClientHashedPassword"), Void.class, HttpStatus.FORBIDDEN);
 		}
 
 		@Test
