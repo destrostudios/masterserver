@@ -90,12 +90,12 @@ class TestIntegration {
 
 		@Test
 		public void confirmEmailUserNotFound() {
-			post("/users/999999/confirmEmail?secret=mySecret", null, Void.class, HttpStatus.NOT_FOUND);
+			post("/users/999999/confirmEmail", "mySecret", Void.class, HttpStatus.NOT_FOUND);
 		}
 
 		@Test
 		public void confirmEmailWrongSecret() {
-			post("/users/1/confirmEmail?secret=mySecret", null, Void.class, HttpStatus.FORBIDDEN);
+			post("/users/destroflyer/confirmEmail", "mySecret", Void.class, HttpStatus.FORBIDDEN);
 		}
 
 		@Test
@@ -110,7 +110,7 @@ class TestIntegration {
 
 		@Test
 		public void resetPasswordWrongSecret() {
-			post("/users/1/resetPassword", new ResetPasswordDto("myEmailSecret", "myClientHashedPassword"), Void.class, HttpStatus.FORBIDDEN);
+			post("/users/destroflyer/resetPassword", new ResetPasswordDto("myEmailSecret", "myClientHashedPassword"), Void.class, HttpStatus.FORBIDDEN);
 		}
 
 		@Test

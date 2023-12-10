@@ -14,6 +14,6 @@ public class BaseExceptionHandler extends ResponseEntityExceptionHandler {
 
     @ExceptionHandler(value = { BaseException.class })
     protected ResponseEntity<Object> handleBaseException(BaseException ex, WebRequest request) {
-        return handleExceptionInternal(ex, new ExceptionDto(ex.getCode(), ex.getMessage()), new HttpHeaders(), ex.getHttpStatus(), request);
+        return handleExceptionInternal(ex, new ExceptionDto("destrostudios", ex.getCode(), ex.getMessage()), new HttpHeaders(), ex.getHttpStatus(), request);
     }
 }

@@ -22,23 +22,23 @@ public class UserController {
     }
 
     @PostMapping("/{login}/sendEmailConfirmationEmail")
-    public void sendEmailConfirmationEmail(@PathVariable String login) throws UserNotFoundException {
+    public void sendEmailConfirmationEmail(@PathVariable String login) throws UserNotFoundException, TooManyEmailRequestsException {
         userService.sendEmailConfirmationEmail(login);
     }
 
-    @PostMapping("/{userId}/confirmEmail")
-    public void confirmEmail(@PathVariable int userId, @RequestParam String secret) throws UserNotFoundException, WrongEmailSecretException {
-        userService.confirmEmail(userId, secret);
+    @PostMapping("/{login}/confirmEmail")
+    public void confirmEmail(@PathVariable String login, @RequestBody String emailSecret) throws UserNotFoundException, WrongEmailSecretException {
+        userService.confirmEmail(login, emailSecret);
     }
 
     @PostMapping("/{login}/sendPasswordResetEmail")
-    public void sendPasswordResetEmail(@PathVariable String login) throws UserNotFoundException {
+    public void sendPasswordResetEmail(@PathVariable String login) throws UserNotFoundException, TooManyEmailRequestsException {
         userService.sendPasswordResetEmail(login);
     }
 
-    @PostMapping("/{userId}/resetPassword")
-    public void resetPassword(@PathVariable int userId, @RequestBody ResetPasswordDto resetPasswordDto) throws UserNotFoundException, WrongEmailSecretException {
-        userService.resetPassword(userId, resetPasswordDto.getEmailSecret(), resetPasswordDto.getClientHashedPassword());
+    @PostMapping("/{login}/resetPassword")
+    public void resetPassword(@PathVariable String login, @RequestBody ResetPasswordDto resetPasswordDto) throws UserNotFoundException, WrongEmailSecretException {
+        userService.resetPassword(login, resetPasswordDto.getEmailSecret(), resetPasswordDto.getClientHashedPassword());
     }
 
     @GetMapping("/{login}/saltClient")

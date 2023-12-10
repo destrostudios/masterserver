@@ -2,6 +2,7 @@ package com.destrostudios.masterserver.service;
 
 import com.destrostudios.masterserver.database.UserRepository;
 import com.destrostudios.masterserver.database.schema.User;
+import com.destrostudios.masterserver.model.Email;
 import com.destrostudios.masterserver.model.LoginDto;
 import com.destrostudios.masterserver.model.RegistrationDto;
 import com.destrostudios.masterserver.service.exceptions.*;
@@ -10,6 +11,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCrypt;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.function.Consumer;
@@ -50,42 +53,49 @@ public class UserService {
             .hashedPassword(hashedPassword)
             .build();
         userRepository.save(user);
-        sendEmailConfirmationEmail(user);
+        emailService.sendEmail(getEmailConfirmationEmail(user));
     }
 
-    public void sendEmailConfirmationEmail(String login) throws UserNotFoundException {
+    public void sendEmailConfirmationEmail(String login) throws UserNotFoundException, TooManyEmailRequestsException {
         User user = getUserByLogin(login);
-        sendEmailConfirmationEmail(user);
+        sendRequestedEmail(user, getEmailConfirmationEmail(user));
     }
 
-    private void sendEmailConfirmationEmail(User user) {
-        sendMail(user, "Confirm your e-mail address", "Here is the code to confirm your e-mail address: " + user.getEmailSecret());
+    private Email getEmailConfirmationEmail(User user) {
+       return new Email(user.getEmail(), "Confirm your e-mail address", "Here is the code to confirm your e-mail address: " + user.getEmailSecret());
     }
 
-    public void sendPasswordResetEmail(String login) throws UserNotFoundException {
+    public void sendPasswordResetEmail(String login) throws UserNotFoundException, TooManyEmailRequestsException {
         User user = getUserByLogin(login);
-        sendMail(user, "Reset your password", "Here is the code to reset your password: " + user.getEmailSecret());
+        sendRequestedEmail(user, new Email(user.getEmail(), "Reset your password", "Here is the code to reset your password: " + user.getEmailSecret()));
     }
 
-    private void sendMail(User user, String subject, String text) {
-        emailService.sendEmail(user.getEmail(), subject, "Hello " + user.getLogin() + "! " + text);
+    private void sendRequestedEmail(User user, Email email) throws TooManyEmailRequestsException {
+        LocalDateTime now = LocalDateTime.now();
+        // Check if at least one minute has passed
+        if ((user.getLastRequestedEmailDate() != null) && (user.getLastRequestedEmailDate().until(now, ChronoUnit.MINUTES) <= 0)) {
+            throw new TooManyEmailRequestsException();
+        }
+        user.setLastRequestedEmailDate(now);
+        userRepository.save(user);
+        emailService.sendEmail(email);
     }
 
     @Transactional
-    public void confirmEmail(int userId, String emailSecret) throws UserNotFoundException, WrongEmailSecretException {
-        updateUserViaEmailSecret(userId, emailSecret, user -> user.setEmailConfirmed(true));
+    public void confirmEmail(String login, String emailSecret) throws UserNotFoundException, WrongEmailSecretException {
+        updateUserViaEmailSecret(login, emailSecret, (user) -> user.setEmailConfirmed(true));
     }
 
     @Transactional
-    public void resetPassword(int userId, String emailSecret, String clientHashedPassword) throws UserNotFoundException, WrongEmailSecretException {
-        updateUserViaEmailSecret(userId, emailSecret, user -> {
+    public void resetPassword(String login, String emailSecret, String clientHashedPassword) throws UserNotFoundException, WrongEmailSecretException {
+        updateUserViaEmailSecret(login, emailSecret, (user) -> {
             String hashedPassword = hashSecret(clientHashedPassword, user.getSaltServer());
             user.setHashedPassword(hashedPassword);
         });
     }
 
-    private void updateUserViaEmailSecret(int userId, String emailSecret, Consumer<User> updateUser) throws UserNotFoundException, WrongEmailSecretException {
-        User user = getUserById(userId);
+    private void updateUserViaEmailSecret(String login, String emailSecret, Consumer<User> updateUser) throws UserNotFoundException, WrongEmailSecretException {
+        User user = getUserByLogin(login);
         if (!emailSecret.equals(user.getEmailSecret())) {
             throw new WrongEmailSecretException();
         }
