@@ -7,11 +7,11 @@ import com.destrostudios.masterserver.database.AppRepository;
 import com.destrostudios.masterserver.database.schema.*;
 import com.destrostudios.masterserver.model.AppFilesDto;
 import com.destrostudios.masterserver.model.AppFilesDtoMapper;
+import com.destrostudios.masterserver.service.annotations.BaseTransactional;
 import com.destrostudios.masterserver.service.exceptions.AppAlreadyAddedException;
 import com.destrostudios.masterserver.service.exceptions.AppFileNotFoundException;
 import com.destrostudios.masterserver.service.exceptions.AppNotAddedException;
 import com.destrostudios.masterserver.service.exceptions.AppNotFoundException;
-import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.stereotype.Service;
@@ -41,7 +41,7 @@ public class AppService {
         return appRepository.findAll();
     }
 
-    @Transactional
+    @BaseTransactional
     public void addToAccount(int userId, int appId) throws AppNotFoundException, AppAlreadyAddedException {
         if (!appRepository.existsById(appId)) {
             throw new AppNotFoundException();
@@ -62,7 +62,7 @@ public class AppService {
         appOwnershipRepository.save(appOwnership);
     }
 
-    @Transactional
+    @BaseTransactional
     public void removeFromAccount(int userId, int appId) throws AppNotFoundException, AppNotAddedException {
         if (!appRepository.existsById(appId)) {
             throw new AppNotFoundException();
@@ -75,7 +75,7 @@ public class AppService {
         appOwnershipRepository.delete(appOwnership);
     }
 
-    @Transactional
+    @BaseTransactional
     public void updateFiles(int appId) throws AppNotFoundException, IOException {
         App app = getApp(appId);
         List<AppFile> oldAppFiles = appFileRepository.findByApp(app);

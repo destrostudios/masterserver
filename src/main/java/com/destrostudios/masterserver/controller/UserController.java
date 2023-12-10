@@ -17,12 +17,12 @@ public class UserController {
     private UserDtoMapper userDtoMapper;
 
     @PostMapping("/register")
-    public void register(@RequestBody RegistrationDto registrationDto) throws BadRequestException, LoginAlreadyExistsException, EmailAlreadyExistsException {
+    public void register(@RequestBody RegistrationDto registrationDto) throws BadRequestException, LoginAlreadyExistsException, EmailAlreadyExistsException, EmailNotSentException {
         userService.register(registrationDto);
     }
 
     @PostMapping("/{login}/sendEmailConfirmationEmail")
-    public void sendEmailConfirmationEmail(@PathVariable String login) throws UserNotFoundException, TooManyEmailRequestsException {
+    public void sendEmailConfirmationEmail(@PathVariable String login) throws UserNotFoundException, TooManyEmailRequestsException, EmailNotSentException {
         userService.sendEmailConfirmationEmail(login);
     }
 
@@ -32,7 +32,7 @@ public class UserController {
     }
 
     @PostMapping("/{login}/sendPasswordResetEmail")
-    public void sendPasswordResetEmail(@PathVariable String login) throws UserNotFoundException, TooManyEmailRequestsException {
+    public void sendPasswordResetEmail(@PathVariable String login) throws UserNotFoundException, TooManyEmailRequestsException, EmailNotSentException {
         userService.sendPasswordResetEmail(login);
     }
 

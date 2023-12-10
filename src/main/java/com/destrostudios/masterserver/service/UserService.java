@@ -5,8 +5,8 @@ import com.destrostudios.masterserver.database.schema.User;
 import com.destrostudios.masterserver.model.Email;
 import com.destrostudios.masterserver.model.LoginDto;
 import com.destrostudios.masterserver.model.RegistrationDto;
+import com.destrostudios.masterserver.service.annotations.BaseTransactional;
 import com.destrostudios.masterserver.service.exceptions.*;
-import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCrypt;
 import org.springframework.stereotype.Service;
@@ -29,8 +29,8 @@ public class UserService {
     @Autowired
     private EmailService emailService;
 
-    @Transactional
-    public void register(RegistrationDto registrationDto) throws BadRequestException, LoginAlreadyExistsException, EmailAlreadyExistsException {
+    @BaseTransactional
+    public void register(RegistrationDto registrationDto) throws BadRequestException, LoginAlreadyExistsException, EmailAlreadyExistsException, EmailNotSentException {
         if (isEmpty(registrationDto.getLogin()) || isEmpty(registrationDto.getEmail()) || isEmpty(registrationDto.getSaltClient()) || isEmpty(registrationDto.getClientHashedPassword())) {
             throw new BadRequestException();
         }
@@ -56,7 +56,7 @@ public class UserService {
         emailService.sendEmail(getEmailConfirmationEmail(user));
     }
 
-    public void sendEmailConfirmationEmail(String login) throws UserNotFoundException, TooManyEmailRequestsException {
+    public void sendEmailConfirmationEmail(String login) throws UserNotFoundException, TooManyEmailRequestsException, EmailNotSentException {
         User user = getUserByLogin(login);
         sendRequestedEmail(user, getEmailConfirmationEmail(user));
     }
@@ -65,12 +65,12 @@ public class UserService {
        return new Email(user.getEmail(), "Confirm your e-mail address", "Here is the code to confirm your e-mail address: " + user.getEmailSecret());
     }
 
-    public void sendPasswordResetEmail(String login) throws UserNotFoundException, TooManyEmailRequestsException {
+    public void sendPasswordResetEmail(String login) throws UserNotFoundException, TooManyEmailRequestsException, EmailNotSentException {
         User user = getUserByLogin(login);
         sendRequestedEmail(user, new Email(user.getEmail(), "Reset your password", "Here is the code to reset your password: " + user.getEmailSecret()));
     }
 
-    private void sendRequestedEmail(User user, Email email) throws TooManyEmailRequestsException {
+    private void sendRequestedEmail(User user, Email email) throws TooManyEmailRequestsException, EmailNotSentException {
         LocalDateTime now = LocalDateTime.now();
         // Check if at least one minute has passed
         if ((user.getLastRequestedEmailDate() != null) && (user.getLastRequestedEmailDate().until(now, ChronoUnit.MINUTES) <= 0)) {
@@ -81,12 +81,12 @@ public class UserService {
         emailService.sendEmail(email);
     }
 
-    @Transactional
+    @BaseTransactional
     public void confirmEmail(String login, String emailSecret) throws UserNotFoundException, WrongEmailSecretException {
         updateUserViaEmailSecret(login, emailSecret, (user) -> user.setEmailConfirmed(true));
     }
 
-    @Transactional
+    @BaseTransactional
     public void resetPassword(String login, String emailSecret, String clientHashedPassword) throws UserNotFoundException, WrongEmailSecretException {
         updateUserViaEmailSecret(login, emailSecret, (user) -> {
             String hashedPassword = hashSecret(clientHashedPassword, user.getSaltServer());
