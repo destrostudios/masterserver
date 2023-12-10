@@ -73,10 +73,10 @@ public class UserService {
     private void sendRequestedEmail(User user, Email email) throws TooManyEmailRequestsException, EmailNotSentException {
         LocalDateTime now = LocalDateTime.now();
         // Check if at least one minute has passed
-        if ((user.getLastRequestedEmailDate() != null) && (user.getLastRequestedEmailDate().until(now, ChronoUnit.MINUTES) <= 0)) {
+        if ((user.getLastRequestedEmailDateTime() != null) && (user.getLastRequestedEmailDateTime().until(now, ChronoUnit.MINUTES) <= 0)) {
             throw new TooManyEmailRequestsException();
         }
-        user.setLastRequestedEmailDate(now);
+        user.setLastRequestedEmailDateTime(now);
         userRepository.save(user);
         emailService.sendEmail(email);
     }

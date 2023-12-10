@@ -21,7 +21,7 @@ public class User {
     private String email;
     private String emailSecret;
     private boolean emailConfirmed;
-    private LocalDateTime lastRequestedEmailDate;
+    private LocalDateTime lastRequestedEmailDateTime;
     private String saltClient;
     private String saltServer;
     private String hashedPassword;
