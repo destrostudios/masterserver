@@ -48,6 +48,7 @@ public class UserService {
             .login(registrationDto.getLogin())
             .email(registrationDto.getEmail())
             .emailSecret(generateUUID())
+            .emailConfirmed(false)
             .saltClient(registrationDto.getSaltClient())
             .saltServer(saltServer)
             .hashedPassword(hashedPassword)
@@ -62,12 +63,12 @@ public class UserService {
     }
 
     private Email getEmailConfirmationEmail(User user) {
-       return new Email(user.getEmail(), "Confirm your e-mail address", "Here is the code to confirm your e-mail address: " + user.getEmailSecret());
+       return new Email(user.getEmail(), "Confirm your e-mail address", "Hello " + user.getLogin() + ", here is the code to confirm your e-mail address: " + user.getEmailSecret());
     }
 
     public void sendPasswordResetEmail(String login) throws UserNotFoundException, TooManyEmailRequestsException, EmailNotSentException {
         User user = getUserByLogin(login);
-        sendRequestedEmail(user, new Email(user.getEmail(), "Reset your password", "Here is the code to reset your password: " + user.getEmailSecret()));
+        sendRequestedEmail(user, new Email(user.getEmail(), "Reset your password", "Hello " + user.getLogin() + ", here is the code to reset your password: " + user.getEmailSecret()));
     }
 
     private void sendRequestedEmail(User user, Email email) throws TooManyEmailRequestsException, EmailNotSentException {
