@@ -1,0 +1,30 @@
+services:
+  db:
+    image: "mysql:8.4.0"
+    environment:
+      MYSQL_ROOT_PASSWORD: $DB_ROOT_PASSWORD
+    healthcheck:
+      test: ["CMD", "mysqladmin" ,"ping", "-h", "localhost"]
+      timeout: 3s
+      retries: 0
+  db-ui:
+    build:
+      dockerfile: db-ui.Dockerfile
+    volumes:
+      - /etc/letsencrypt:/etc/letsencrypt:ro
+    ports:
+      - "8082:443"
+  app:
+    build:
+      dockerfile: app.Dockerfile
+    environment:
+      SERVER_SSL_KEY-STORE-PASSWORD: $KEYSTORE_PASSWORD
+      SPRING_DATASOURCE_PASSWORD: $DB_ROOT_PASSWORD
+      SPRING_MAIL_PASSWORD: $SUPPORT_EMAIL_PASSWORD
+    volumes:
+      - /var/www/destrostudios/apps:/home/apps:ro
+    ports:
+      - "8081:8080"
+    depends_on:
+      db:
+        condition: service_healthy
