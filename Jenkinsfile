@@ -27,8 +27,6 @@ pipeline {
                 dir ('docker') {
                     withCredentials([
                         string(credentialsId: 'keystore-password', variable: 'KEYSTORE_PASSWORD'),
-                        string(credentialsId: 'db-root-password', variable: 'DB_ROOT_PASSWORD'),
-                        string(credentialsId: 'support-email-password', variable: 'SUPPORT_EMAIL_PASSWORD'),
                         string(credentialsId: 'auth-private-key-passphrase', variable: 'AUTH_PRIVATE_KEY_PASSPHRASE'),
                         file(credentialsId: 'auth-private-key', variable: 'AUTH_PRIVATE_KEY'),
                     ]) {
