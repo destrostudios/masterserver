@@ -23,6 +23,7 @@ pipeline {
         stage('Build image') {
             steps {
                 unstash 'target'
+                sh 'mv target docker'
                 dir ('docker') {
                     withCredentials([
                         string(credentialsId: 'keystore-password', variable: 'KEYSTORE_PASSWORD'),
