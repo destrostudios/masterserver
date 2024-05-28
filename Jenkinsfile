@@ -1,8 +1,9 @@
 pipeline {
     agent any
     options {
-        ansiColor('xterm')
         buildDiscarder(logRotator(numToKeepStr: '10'))
+        skipDefaultCheckout()
+        ansiColor('xterm')
     }
     stages {
         stage('Checkout') {
