@@ -1,0 +1,32 @@
+pipeline {
+    agent any
+    options {
+        ansiColor('xterm')
+        buildDiscarder(logRotator(numToKeepStr: '10'))
+    }
+    stages {
+        stage('Checkout') {
+            steps {
+                checkout scm
+            }
+        }
+        stage('Deploy') {
+            steps {
+                dir ('docker') {
+                    withCredentials([
+                        string(credentialsId: 'keystore-password', variable: 'KEYSTORE_PASSWORD'),
+                        string(credentialsId: 'db-root-password', variable: 'DB_ROOT_PASSWORD'),
+                        string(credentialsId: 'support-email-password', variable: 'SUPPORT_EMAIL_PASSWORD'),
+                    ]) {
+                        sh 'docker compose up -d'
+                    }
+                }
+            }
+        }
+    }
+    post {
+        always {
+            cleanWs()
+        }
+    }
+}
