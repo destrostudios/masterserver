@@ -2,6 +2,7 @@ pipeline {
     agent any
     options {
         ansiColor('xterm')
+        buildDiscarder(logRotator(numToKeepStr: '10'))
     }
     stages {
         stage('Checkout') {
@@ -20,7 +21,7 @@ pipeline {
                 stash includes: 'target/masterserver-1.0.0.jar', name: 'target'
             }
         }
-        stage('Build image') {
+        stage('Build') {
             steps {
                 unstash 'target'
                 sh 'mv target docker'
