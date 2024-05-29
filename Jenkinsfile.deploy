@@ -24,12 +24,10 @@ pipeline {
             }
             steps {
                 sh 'mvn clean install'
-                stash includes: 'target/masterserver-1.0.0.jar', name: 'target'
             }
         }
         stage('Deploy') {
             steps {
-                unstash 'target'
                 sh 'mv target docker'
                 dir ('docker') {
                     withCredentials([
