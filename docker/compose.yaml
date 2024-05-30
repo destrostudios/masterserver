@@ -12,8 +12,7 @@ services:
       retries: 0
     restart: always
   db-ui:
-    build:
-      dockerfile: db-ui.Dockerfile
+    image: "destrostudios/phpmyadmin:latest"
     volumes:
       - /etc/letsencrypt:/etc/letsencrypt:ro
     ports:
