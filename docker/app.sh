@@ -1,3 +1,5 @@
+env
+
 openssl rsa -in $AUTH_PRIVATE_KEY -passin pass:$AUTH_PRIVATE_KEY_PASSPHRASE -outform DER -out private.der
 openssl rsa -in $AUTH_PRIVATE_KEY -passin pass:$AUTH_PRIVATE_KEY_PASSPHRASE -pubout -outform PEM -out public.pem
 
