@@ -37,7 +37,8 @@ pipeline {
                         string(credentialsId: 'destrostudios-auth-private-key-passphrase', variable: 'AUTH_PRIVATE_KEY_PASSPHRASE'),
                         file(credentialsId: 'destrostudios-auth-private-key', variable: 'AUTH_PRIVATE_KEY')
                     ]) {
-                        sh 'cp $AUTH_PRIVATE_KEY private.pem'
+                        sh 'openssl rsa -in $AUTH_PRIVATE_KEY -passin pass:$AUTH_PRIVATE_KEY_PASSPHRASE -outform DER -out private.der'
+                        sh 'openssl rsa -in $AUTH_PRIVATE_KEY -passin pass:$AUTH_PRIVATE_KEY_PASSPHRASE -pubout -outform PEM -out public.pem'
                         sh 'docker compose build --no-cache'
                         sh 'docker compose up -d'
                     }
