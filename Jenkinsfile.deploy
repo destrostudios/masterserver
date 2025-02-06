@@ -31,12 +31,13 @@ pipeline {
                 sh 'mv target docker'
                 dir ('docker') {
                     withCredentials([
-                        string(credentialsId: 'destrostudios-auth-private-key', variable: 'AUTH_PRIVATE_KEY'),
-                        string(credentialsId: 'destrostudios-auth-private-key-passphrase', variable: 'AUTH_PRIVATE_KEY_PASSPHRASE'),
                         string(credentialsId: 'keystore-password', variable: 'KEYSTORE_PASSWORD'),
                         string(credentialsId: 'db-root-password', variable: 'DB_ROOT_PASSWORD'),
-                        string(credentialsId: 'support-email-password', variable: 'SUPPORT_EMAIL_PASSWORD')
+                        string(credentialsId: 'support-email-password', variable: 'SUPPORT_EMAIL_PASSWORD'),
+                        string(credentialsId: 'destrostudios-auth-private-key-passphrase', variable: 'AUTH_PRIVATE_KEY_PASSPHRASE'),
+                        file(credentialsId: 'destrostudios-auth-private-key', variable: 'AUTH_PRIVATE_KEY')
                     ]) {
+                        sh 'cp $AUTH_PRIVATE_KEY private.pem'
                         sh 'docker compose build --no-cache'
                         sh 'docker compose up -d'
                     }
