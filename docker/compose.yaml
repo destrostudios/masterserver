@@ -27,6 +27,7 @@ services:
       SPRING_DATASOURCE_PASSWORD: $DB_ROOT_PASSWORD
       SPRING_MAIL_PASSWORD: $SUPPORT_EMAIL_PASSWORD
     volumes:
+      - /etc/letsencrypt:/etc/letsencrypt:ro
       - /var/www/destrostudios/apps:/home/apps:ro
     ports:
       - "8080:8080"
