@@ -17,7 +17,7 @@ public class AppHighscoreDto {
     private AppBasicDto app;
     private String context;
     private UserBasicDto user;
-    private int score;
+    private long score;
     private String metadata;
     private LocalDateTime dateTime;
 

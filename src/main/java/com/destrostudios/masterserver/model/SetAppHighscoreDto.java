@@ -13,7 +13,7 @@ public class SetAppHighscoreDto {
 
     private String context;
     private AppHighscoreEvaluation evaluation;
-    private int score;
+    private long score;
     private String metadata;
 
 }

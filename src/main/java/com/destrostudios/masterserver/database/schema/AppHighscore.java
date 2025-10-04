@@ -21,7 +21,7 @@ public class AppHighscore {
     @ManyToOne
     private App app;
     private String context;
-    private int score;
+    private long score;
     private String metadata;
     private LocalDateTime dateTime;
 
