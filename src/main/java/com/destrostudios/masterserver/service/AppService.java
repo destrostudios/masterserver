@@ -80,40 +80,46 @@ public class AppService {
         appOwnershipRepository.delete(appOwnership);
     }
 
-    public List<AppHighscore> getHighscores(int appId, AppHighscoreEvaluation evaluation, Integer limitPerContext) throws AppNotFoundException {
+    public List<AppHighscore> getHighscoresByApp(int appId, String login, AppHighscoreEvaluation evaluation, Integer limitPerContext) throws AppNotFoundException {
         if (!appRepository.existsById(appId)) {
             throw new AppNotFoundException();
         }
         Query query = entityManager.createNativeQuery(
             "SELECT * FROM ("
-            + " SELECT *, ROW_NUMBER() OVER (PARTITION BY context ORDER BY score " + ((evaluation == AppHighscoreEvaluation.HIGHER) ? "DESC" : "ASC") + ") AS rn"
-            + " FROM app_highscore"
+            + " SELECT ah.*, ROW_NUMBER() OVER (PARTITION BY context ORDER BY score " + ((evaluation == AppHighscoreEvaluation.HIGHER) ? "DESC" : "ASC") + ") AS rn"
+            + " FROM app_highscore ah"
+            + ((login != null) ? " JOIN user u ON u.id = ah.user_id" : "")
             + " WHERE app_id = :appId"
+            + ((login != null) ? " AND u.login = :login" : "")
             + ") tmp"
             + ((limitPerContext != null) ? " WHERE tmp.rn <= :limitPerContext" : ""),
             AppHighscore.class
         );
         query.setParameter("appId", appId);
+        if (login != null) {
+            query.setParameter("login", login);
+        }
         if (limitPerContext != null) {
             query.setParameter("limitPerContext", limitPerContext);
         }
         return query.getResultList();
     }
 
-    public List<AppHighscore> getHighscores(int appId, String context, AppHighscoreEvaluation evaluation, Integer limit) throws AppNotFoundException {
+    public List<AppHighscore> getHighscoresByContext(int appId, String context, AppHighscoreEvaluation evaluation, Integer limit) throws AppNotFoundException {
         if (!appRepository.existsById(appId)) {
             throw new AppNotFoundException();
         }
         Query query = entityManager.createNativeQuery(
             "SELECT * FROM app_highscore"
             + " WHERE app_id = :appId AND context = :context"
-            + ((evaluation != null) ? " ORDER BY score " + (evaluation == AppHighscoreEvaluation.HIGHER ? "DESC" : "ASC") : ""),
+            + ((evaluation != null) ? " ORDER BY score " + (evaluation == AppHighscoreEvaluation.HIGHER ? "DESC" : "ASC") : "")
+            + ((limit != null) ? " LIMIT :limit" : ""),
             AppHighscore.class
         );
         query.setParameter("appId", appId);
         query.setParameter("context", context);
         if (limit != null) {
-            query.setMaxResults(limit);
+            query.setParameter("limit", limit);
         }
         return query.getResultList();
     }

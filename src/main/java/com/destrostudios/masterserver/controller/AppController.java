@@ -36,13 +36,13 @@ public class AppController {
     }
 
     @GetMapping("/{appId}/highscores")
-    public List<AppHighscoreDto> getHighscores(@PathVariable int appId, @RequestParam AppHighscoreEvaluation evaluation, @RequestParam(required = false) Integer limitPerContext) throws AppNotFoundException {
-        return appHighscoreDtoMapper.map(appService.getHighscores(appId, evaluation, limitPerContext));
+    public List<AppHighscoreDto> getHighscoresByApp(@PathVariable int appId, @RequestParam(required = false) String login, @RequestParam AppHighscoreEvaluation evaluation, @RequestParam(required = false) Integer limitPerContext) throws AppNotFoundException {
+        return appHighscoreDtoMapper.map(appService.getHighscoresByApp(appId, login, evaluation, limitPerContext));
     }
 
     @GetMapping("/{appId}/highscores/{context}")
-    public List<AppHighscoreDto> getHighscores(@PathVariable int appId, @PathVariable String context, @RequestParam AppHighscoreEvaluation evaluation, @RequestParam(required = false) Integer limit) throws AppNotFoundException {
-        return appHighscoreDtoMapper.map(appService.getHighscores(appId, context, evaluation, limit));
+    public List<AppHighscoreDto> getHighscoresByContext(@PathVariable int appId, @PathVariable String context, @RequestParam AppHighscoreEvaluation evaluation, @RequestParam(required = false) Integer limit) throws AppNotFoundException {
+        return appHighscoreDtoMapper.map(appService.getHighscoresByContext(appId, context, evaluation, limit));
     }
 
     @PostMapping("/{appId}/setHighscore")
