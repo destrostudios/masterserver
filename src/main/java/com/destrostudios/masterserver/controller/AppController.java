@@ -36,8 +36,8 @@ public class AppController {
     }
 
     @GetMapping("/{appId}/highscores")
-    public List<AppHighscoreDto> getHighscoresByApp(@PathVariable int appId, @RequestParam(required = false) String login, @RequestParam AppHighscoreEvaluation evaluation, @RequestParam(required = false) Integer limitPerContext) throws AppNotFoundException {
-        return appHighscoreDtoMapper.map(appService.getHighscoresByApp(appId, login, evaluation, limitPerContext));
+    public List<AppHighscoreDto> getHighscoresByApp(@PathVariable int appId, @RequestParam AppHighscoreEvaluation evaluation, @RequestParam(required = false) String login, @RequestParam(required = false) Integer limitPerContext) throws AppNotFoundException {
+        return appHighscoreDtoMapper.map(appService.getHighscoresByApp(appId, evaluation, login, limitPerContext));
     }
 
     @GetMapping("/{appId}/highscores/{context}")

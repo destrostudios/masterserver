@@ -80,7 +80,7 @@ public class AppService {
         appOwnershipRepository.delete(appOwnership);
     }
 
-    public List<AppHighscore> getHighscoresByApp(int appId, String login, AppHighscoreEvaluation evaluation, Integer limitPerContext) throws AppNotFoundException {
+    public List<AppHighscore> getHighscoresByApp(int appId, AppHighscoreEvaluation evaluation, String login, Integer limitPerContext) throws AppNotFoundException {
         if (!appRepository.existsById(appId)) {
             throw new AppNotFoundException();
         }
