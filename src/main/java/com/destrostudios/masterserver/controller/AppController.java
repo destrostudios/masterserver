@@ -1,10 +1,7 @@
 package com.destrostudios.masterserver.controller;
 
 import com.destrostudios.masterserver.database.schema.App;
-import com.destrostudios.masterserver.model.AppFilesDto;
-import com.destrostudios.masterserver.model.AppHighscoreDto;
-import com.destrostudios.masterserver.model.AppHighscoreDtoMapper;
-import com.destrostudios.masterserver.model.SetAppHighscoreDto;
+import com.destrostudios.masterserver.model.*;
 import com.destrostudios.masterserver.service.AppService;
 import com.destrostudios.masterserver.service.exceptions.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,13 +36,13 @@ public class AppController {
     }
 
     @GetMapping("/{appId}/highscores")
-    public List<AppHighscoreDto> getHighscores(@PathVariable int appId) throws AppNotFoundException {
-        return appHighscoreDtoMapper.map(appService.getHighscores(appId));
+    public List<AppHighscoreDto> getHighscores(@PathVariable int appId, @RequestParam AppHighscoreEvaluation evaluation, @RequestParam(required = false) Integer limitPerContext) throws BadRequestException, AppNotFoundException {
+        return appHighscoreDtoMapper.map(appService.getHighscores(appId, evaluation, limitPerContext));
     }
 
     @GetMapping("/{appId}/highscores/{context}")
-    public List<AppHighscoreDto> getHighscores(@PathVariable int appId, @PathVariable String context) throws AppNotFoundException {
-        return appHighscoreDtoMapper.map(appService.getHighscores(appId, context));
+    public List<AppHighscoreDto> getHighscores(@PathVariable int appId, @PathVariable String context, @RequestParam AppHighscoreEvaluation evaluation, @RequestParam(required = false) Integer limit) throws BadRequestException, AppNotFoundException {
+        return appHighscoreDtoMapper.map(appService.getHighscores(appId, context, evaluation, limit));
     }
 
     @PostMapping("/{appId}/setHighscore")

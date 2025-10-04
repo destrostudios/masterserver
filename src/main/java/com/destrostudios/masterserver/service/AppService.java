@@ -8,6 +8,9 @@ import com.destrostudios.masterserver.model.SetAppHighscoreDto;
 import com.destrostudios.masterserver.model.AppHighscoreEvaluation;
 import com.destrostudios.masterserver.service.annotations.BaseTransactional;
 import com.destrostudios.masterserver.service.exceptions.*;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
+import jakarta.persistence.Query;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.stereotype.Service;
@@ -22,6 +25,8 @@ import static org.springframework.util.ObjectUtils.isEmpty;
 @Service
 public class AppService {
 
+    @PersistenceContext
+    private EntityManager entityManager;
     @Autowired
     private AppRepository appRepository;
     @Autowired
@@ -75,18 +80,48 @@ public class AppService {
         appOwnershipRepository.delete(appOwnership);
     }
 
-    public List<AppHighscore> getHighscores(int appId) throws AppNotFoundException {
+    public List<AppHighscore> getHighscores(int appId, AppHighscoreEvaluation evaluation, Integer limitPerContext) throws BadRequestException, AppNotFoundException {
+        if (evaluation == null) {
+            throw new BadRequestException();
+        }
         if (!appRepository.existsById(appId)) {
             throw new AppNotFoundException();
         }
-        return appHighscoreRepository.findByAppId(appId);
+        Query query = entityManager.createNativeQuery(
+            "SELECT * FROM ("
+            + " SELECT *, ROW_NUMBER() OVER (PARTITION BY context ORDER BY score " + ((evaluation == AppHighscoreEvaluation.HIGHER) ? "DESC" : "ASC") + ") AS rn"
+            + " FROM app_highscore"
+            + " WHERE app_id = :appId"
+            + ") tmp"
+            + ((limitPerContext != null) ? " WHERE tmp.rn <= :limitPerContext" : ""),
+            AppHighscore.class
+        );
+        query.setParameter("appId", appId);
+        if (limitPerContext != null) {
+            query.setParameter("limitPerContext", limitPerContext);
+        }
+        return query.getResultList();
     }
 
-    public List<AppHighscore> getHighscores(int appId, String context) throws AppNotFoundException {
+    public List<AppHighscore> getHighscores(int appId, String context, AppHighscoreEvaluation evaluation, Integer limit) throws BadRequestException, AppNotFoundException {
+        if (evaluation == null) {
+            throw new BadRequestException();
+        }
         if (!appRepository.existsById(appId)) {
             throw new AppNotFoundException();
         }
-        return appHighscoreRepository.findByAppIdAndContext(appId, context);
+        Query query = entityManager.createNativeQuery(
+            "SELECT * FROM app_highscore"
+            + " WHERE app_id = :appId AND context = :context"
+            + ((evaluation != null) ? " ORDER BY score " + (evaluation == AppHighscoreEvaluation.HIGHER ? "DESC" : "ASC") : ""),
+            AppHighscore.class
+        );
+        query.setParameter("appId", appId);
+        query.setParameter("context", context);
+        if (limit != null) {
+            query.setMaxResults(limit);
+        }
+        return query.getResultList();
     }
 
     @BaseTransactional
