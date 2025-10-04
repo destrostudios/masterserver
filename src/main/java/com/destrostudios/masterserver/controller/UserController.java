@@ -1,6 +1,5 @@
 package com.destrostudios.masterserver.controller;
 
-import com.destrostudios.masterserver.database.schema.User;
 import com.destrostudios.masterserver.model.*;
 import com.destrostudios.masterserver.service.UserService;
 import com.destrostudios.masterserver.service.exceptions.*;
@@ -52,8 +51,7 @@ public class UserController {
     }
 
     @GetMapping("/{userIdOrLogin}")
-    public UserDto getUser(@PathVariable String userIdOrLogin) throws UserNotFoundException {
-        User user = userService.getUserByIdOrLogin(userIdOrLogin);
-        return userDtoMapper.map(user);
+    public UserDetailedDto getUser(@PathVariable String userIdOrLogin) throws UserNotFoundException {
+        return userDtoMapper.mapDetailed(userService.getUserByIdOrLogin(userIdOrLogin));
     }
 }

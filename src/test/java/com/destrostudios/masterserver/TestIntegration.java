@@ -35,22 +35,22 @@ class TestIntegration {
 
 		@Test
 		public void getUserByIdSuccess() {
-			assertUserDto(get("/users/1", UserDto.class, HttpStatus.OK));
+			assertUserDetailedDto(get("/users/1", UserDetailedDto.class, HttpStatus.OK));
 		}
 
 		@Test
 		public void getUserByIdNotFound() {
-			get("/users/999999", UserDto.class, HttpStatus.NOT_FOUND);
+			get("/users/999999", UserDetailedDto.class, HttpStatus.NOT_FOUND);
 		}
 
 		@Test
 		public void getUserByLoginSuccess() {
-			assertUserDto(get("/users/destroflyer", UserDto.class, HttpStatus.OK));;
+			assertUserDetailedDto(get("/users/destroflyer", UserDetailedDto.class, HttpStatus.OK));;
 		}
 
 		@Test
 		public void getUserByLoginNotFound() {
-			get("/users/thisLoginDoesNotExist", UserDto.class, HttpStatus.NOT_FOUND);
+			get("/users/thisLoginDoesNotExist", UserDetailedDto.class, HttpStatus.NOT_FOUND);
 		}
 
 		@Test
@@ -210,10 +210,10 @@ class TestIntegration {
 			get("/authToken/verify", getSingleHeaderRequestEntity(null, "authToken", "myInvalidAuthToken"), String.class, HttpStatus.FORBIDDEN);
 		}
 
-		private void assertUserDto(UserDto userDto) {
-			assertEquals(1, userDto.getId());
-			assertEquals("destroflyer", userDto.getLogin());
-			assertTrue(userDto.getOwnedAppIds().size() > 0);
+		private void assertUserDetailedDto(UserDetailedDto userDetailedDto) {
+			assertEquals(1, userDetailedDto.getId());
+			assertEquals("destroflyer", userDetailedDto.getLogin());
+			assertTrue(userDetailedDto.getOwnedAppIds().size() > 0);
 		}
 
 		private void assertUserClaims(Map<String, Object> userClaims) {

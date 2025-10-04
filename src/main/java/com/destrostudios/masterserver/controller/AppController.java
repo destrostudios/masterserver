@@ -2,11 +2,11 @@ package com.destrostudios.masterserver.controller;
 
 import com.destrostudios.masterserver.database.schema.App;
 import com.destrostudios.masterserver.model.AppFilesDto;
+import com.destrostudios.masterserver.model.AppHighscoreDto;
+import com.destrostudios.masterserver.model.AppHighscoreDtoMapper;
+import com.destrostudios.masterserver.model.SetAppHighscoreDto;
 import com.destrostudios.masterserver.service.AppService;
-import com.destrostudios.masterserver.service.exceptions.AppAlreadyAddedException;
-import com.destrostudios.masterserver.service.exceptions.AppFileNotFoundException;
-import com.destrostudios.masterserver.service.exceptions.AppNotAddedException;
-import com.destrostudios.masterserver.service.exceptions.AppNotFoundException;
+import com.destrostudios.masterserver.service.exceptions.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.web.bind.annotation.*;
@@ -20,6 +20,8 @@ public class AppController {
 
     @Autowired
     private AppService appService;
+    @Autowired
+    private AppHighscoreDtoMapper appHighscoreDtoMapper;
 
     @GetMapping
     public List<App> getApps() {
@@ -34,6 +36,21 @@ public class AppController {
     @PostMapping("/{appId}/removeFromAccount")
     public void removeFromAccount(@RequestAttribute int userId, @PathVariable int appId) throws AppNotFoundException, AppNotAddedException {
         appService.removeFromAccount(userId, appId);
+    }
+
+    @GetMapping("/{appId}/highscores")
+    public List<AppHighscoreDto> getHighscores(@PathVariable int appId) throws AppNotFoundException {
+        return appHighscoreDtoMapper.map(appService.getHighscores(appId));
+    }
+
+    @GetMapping("/{appId}/highscores/{context}")
+    public List<AppHighscoreDto> getHighscores(@PathVariable int appId, @PathVariable String context) throws AppNotFoundException {
+        return appHighscoreDtoMapper.map(appService.getHighscores(appId, context));
+    }
+
+    @PostMapping("/{appId}/setHighscore")
+    public void setHighscore(@RequestAttribute int userId, @PathVariable int appId, @RequestBody SetAppHighscoreDto setAppHighscoreDto) throws BadRequestException, AppNotFoundException, NotAHighscoreException {
+        appService.setHighscore(userId, appId, setAppHighscoreDto);
     }
 
     @PostMapping("/{appId}/updateFiles")

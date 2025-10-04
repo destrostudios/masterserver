@@ -1,17 +1,13 @@
 package com.destrostudios.masterserver.service;
 
-import com.destrostudios.masterserver.database.AppFileProtectionRepository;
-import com.destrostudios.masterserver.database.AppFileRepository;
-import com.destrostudios.masterserver.database.AppOwnershipRepository;
-import com.destrostudios.masterserver.database.AppRepository;
+import com.destrostudios.masterserver.database.*;
 import com.destrostudios.masterserver.database.schema.*;
 import com.destrostudios.masterserver.model.AppFilesDto;
 import com.destrostudios.masterserver.model.AppFilesDtoMapper;
+import com.destrostudios.masterserver.model.SetAppHighscoreDto;
+import com.destrostudios.masterserver.model.AppHighscoreEvaluation;
 import com.destrostudios.masterserver.service.annotations.BaseTransactional;
-import com.destrostudios.masterserver.service.exceptions.AppAlreadyAddedException;
-import com.destrostudios.masterserver.service.exceptions.AppFileNotFoundException;
-import com.destrostudios.masterserver.service.exceptions.AppNotAddedException;
-import com.destrostudios.masterserver.service.exceptions.AppNotFoundException;
+import com.destrostudios.masterserver.service.exceptions.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.stereotype.Service;
@@ -21,6 +17,8 @@ import java.time.LocalDateTime;
 import java.util.LinkedList;
 import java.util.List;
 
+import static org.springframework.util.ObjectUtils.isEmpty;
+
 @Service
 public class AppService {
 
@@ -28,6 +26,8 @@ public class AppService {
     private AppRepository appRepository;
     @Autowired
     private AppOwnershipRepository appOwnershipRepository;
+    @Autowired
+    private AppHighscoreRepository appHighscoreRepository;
     @Autowired
     private AppFileRepository appFileRepository;
     @Autowired
@@ -73,6 +73,54 @@ public class AppService {
             throw new AppNotAddedException();
         }
         appOwnershipRepository.delete(appOwnership);
+    }
+
+    public List<AppHighscore> getHighscores(int appId) throws AppNotFoundException {
+        if (!appRepository.existsById(appId)) {
+            throw new AppNotFoundException();
+        }
+        return appHighscoreRepository.findByAppId(appId);
+    }
+
+    public List<AppHighscore> getHighscores(int appId, String context) throws AppNotFoundException {
+        if (!appRepository.existsById(appId)) {
+            throw new AppNotFoundException();
+        }
+        return appHighscoreRepository.findByAppIdAndContext(appId, context);
+    }
+
+    @BaseTransactional
+    public void setHighscore(int userId, int appId, SetAppHighscoreDto setAppHighscoreDto) throws BadRequestException, AppNotFoundException, NotAHighscoreException {
+        if (isEmpty(setAppHighscoreDto.getContext()) || (setAppHighscoreDto.getEvaluation() == null)) {
+            throw new BadRequestException();
+        }
+        if (!appRepository.existsById(appId)) {
+            throw new AppNotFoundException();
+        }
+        AppHighscore appHighscore = appHighscoreRepository.findByAppIdAndContextAndUserId(appId, setAppHighscoreDto.getContext(), userId);
+        if (appHighscore == null) {
+            appHighscoreRepository.save(AppHighscore.builder()
+                .user(User.builder()
+                    .id(userId)
+                    .build())
+                .app(App.builder()
+                    .id(appId)
+                    .build())
+                .context(setAppHighscoreDto.getContext())
+                .score(setAppHighscoreDto.getScore())
+                .metadata(setAppHighscoreDto.getMetadata())
+                .dateTime(LocalDateTime.now())
+                .build());
+        } else {
+            if (((setAppHighscoreDto.getEvaluation() == AppHighscoreEvaluation.HIGHER) && (setAppHighscoreDto.getScore() <= appHighscore.getScore()))
+             || ((setAppHighscoreDto.getEvaluation() == AppHighscoreEvaluation.LOWER) && (setAppHighscoreDto.getScore() >= appHighscore.getScore()))) {
+                throw new NotAHighscoreException();
+            }
+            appHighscore.setScore(setAppHighscoreDto.getScore());
+            appHighscore.setMetadata(appHighscore.getMetadata());
+            appHighscore.setDateTime(LocalDateTime.now());
+            appHighscoreRepository.save(appHighscore);
+        }
     }
 
     @BaseTransactional

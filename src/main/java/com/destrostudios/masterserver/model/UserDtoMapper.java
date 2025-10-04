@@ -9,11 +9,18 @@ import java.util.stream.Collectors;
 @Service
 public class UserDtoMapper {
 
-    public UserDto map(User user) {
+    public UserBasicDto mapBasic(User user) {
+        return UserBasicDto.builder()
+            .id(user.getId())
+            .login(user.getLogin())
+            .build();
+    }
+
+    public UserDetailedDto mapDetailed(User user) {
         List<Integer> ownedAppIds = user.getAppOwnerships().stream()
             .map(appOwnership -> appOwnership.getApp().getId())
             .collect(Collectors.toList());
-        return UserDto.builder()
+        return UserDetailedDto.builder()
             .id(user.getId())
             .login(user.getLogin())
             .ownedAppIds(ownedAppIds)
