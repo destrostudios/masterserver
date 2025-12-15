@@ -152,7 +152,7 @@ public class AppService {
                 throw new NotAHighscoreException();
             }
             appHighscore.setScore(setAppHighscoreDto.getScore());
-            appHighscore.setMetadata(appHighscore.getMetadata());
+            appHighscore.setMetadata(setAppHighscoreDto.getMetadata());
             appHighscore.setDateTime(LocalDateTime.now());
             appHighscoreRepository.save(appHighscore);
         }
