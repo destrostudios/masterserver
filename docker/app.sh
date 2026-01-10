@@ -1,2 +1,2 @@
-openssl pkcs12 -export -in /etc/letsencrypt/live/anselm-kuesters.de/cert.pem -inkey /etc/letsencrypt/live/anselm-kuesters.de/privkey.pem -certfile /etc/letsencrypt/live/anselm-kuesters.de/chain.pem -out keystore.p12 -passout pass:$SERVER_SSL_KEYSTOREPASSWORD -name destrostudios
+openssl pkcs12 -export -in /etc/letsencrypt/live/destrostudios.com/cert.pem -inkey /etc/letsencrypt/live/destrostudios.com/privkey.pem -certfile /etc/letsencrypt/live/destrostudios.com/chain.pem -out keystore.p12 -passout pass:$SERVER_SSL_KEYSTOREPASSWORD -name destrostudios
 java -jar masterserver-1.0.0.jar
